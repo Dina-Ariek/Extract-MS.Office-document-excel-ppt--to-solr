@@ -130,8 +130,8 @@ if __name__ == "__main__":
 
     if f is not None and d is None:
         result = processFile(f)
-        print(result)
-        # push_solr(result)
+        #print(result)
+        push_solr(result)
     else:
         result1 = processFolder(d)
         #print(result1)
