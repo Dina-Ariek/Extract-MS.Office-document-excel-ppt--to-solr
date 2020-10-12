@@ -36,12 +36,13 @@ def jpeg_res(filename):
         return '{} x {}'.format(width, height)
 
 
-def processFile(namafile):
+def processFile(namafile, p):
     typeFile = os.path.splitext(namafile)[1][1:].strip()
-    if typeFile in ("doc", "docx"):  # filter documnet file
+    if typeFile in ("doc", "docx"):  # filter document file
         data = getText(namafile)
         d = dict();
-        d['filename'] = namafile
+        #d['nama file'] = namafile
+        d['resource'] = p
         d['data'] = data
         return d
 
@@ -53,7 +54,8 @@ def processFile(namafile):
             PC_sheets.append(xlsx.parse(sheet))
         data = ' '.join([str(elem) for elem in PC_sheets])
         d = dict();
-        d['filename'] = namafile
+        #d['resource'] = namafile
+        d['resource'] = p
         d['data'] = data
         return d
 
@@ -70,7 +72,8 @@ def processFile(namafile):
                         data1.append(run.text)
                         data = str("".join(data1))
         d = dict();
-        d['filename'] = namafile
+        #d['resource'] = namafile
+        d['resource'] = p
         d['data'] = data
         return d
 
@@ -81,12 +84,13 @@ def processFile(namafile):
         # extension1 = os.path.splitext(f)[1][1:].strip()
         data = jpeg_res(namafile)
         d = dict();
-        d['filename'] = namafile
+        #d['resource'] = namafile
+        d['resource'] = p
         d['size'] = data
         return d
 
 
-def processFolder(namafolder):
+def processFolder(namafolder,p):
     curentfolder = os.getcwd()
     list_path = []
     data = []
@@ -95,7 +99,7 @@ def processFolder(namafolder):
         if os.path.isfile(full_path):
             list_path.append(full_path)
     for filename in list_path:
-        hasil = processFile(filename)
+        hasil = processFile(filename,p)
         if hasil is not None:
             data.append(hasil)
     return data
@@ -122,17 +126,20 @@ if __name__ == "__main__":
 
     parser.add_argument('-d', type=str, required=False,
                         help="processing folder")
+    parser.add_argument('-p', type=str, required=False,
+                        help="processing folder")
 
     args = parser.parse_args()
 
     f = args.f
     d = args.d
+    p = args.p
 
-    if f is not None and d is None:
-        result = processFile(f)
+    if f is not None and p is not None and d is None:
+        result = processFile(f, p)
         #print(result)
-        push_solr(result)
+        push_solr_folder(result)
     else:
-        result1 = processFolder(d)
+        result1 = processFolder(d,p)
         #print(result1)
         push_solr_folder(result1)
